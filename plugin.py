@@ -13,7 +13,6 @@ Version:    0.1.1: beta
     </description>
     <params>
         <param field="Address" label="Domoticz IP Address" width="200px" required="true" default="127.0.0.1"/>
-        <param field="Password" label="AC Brand" width="300px" required="true" default=""/>
         <param field="Mode1" label="CAC221 widgets idx - AC mode - AC Fanspeed - AC Setpoint" width="100px" required="true" default=""/>
         <param field="Mode2" label="Pause sensors (csv list of idx)" width="100px" required="false" default=""/>
         <param field="Mode3" label="Presence Sensors (csv list of idx)" width="100px" required="false" default=""/>
@@ -174,7 +173,7 @@ class BasePlugin:
             self.WACsetpoint = CheckParam("AC Stepoint",params[2],0)
             Domoticz.Debug("AC setpoint widget idx = {}".format(self.WACsetpoint))
         else:
-            Domoticz.Error("Error reading CAC221 widgets idx)
+            Domoticz.Error("Error reading CAC221 widgets idx")
 
         # build lists of sensors
         self.DTpresence = parseCSV(Parameters["Mode3"])
