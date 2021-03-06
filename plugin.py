@@ -475,14 +475,14 @@ class BasePlugin:
         if APIjson:
             for device in APIjson["result"]:  # check if idx is ok
                 self.WACmodevalue = int(device["Level"])
-                Domoticz.Debug("AC mode widget Level = {}".format(self.WACmodevalue))
+                #Domoticz.Debug("AC mode widget Level = {}".format(self.WACmodevalue))
 
         # check fan
         APIjson = DomoticzAPI("type=devices&rid={}".format(self.WACfanspeed))
         if APIjson:
            for device in APIjson["result"]:  # check if idx is ok
                 self.WACfanspeedvalue = int(device["Level"]
-                Domoticz.Debug("AC fan widget Level = {}".format(self.WACfanspeedvalue))
+                #Domoticz.Debug("AC fan widget Level = {}".format(self.WACfanspeedvalue))
 
         # check setpoint
         #APIjson = DomoticzAPI("type=devices&rid={}".format(self.WACsetpoint))
