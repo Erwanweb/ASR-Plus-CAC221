@@ -480,11 +480,11 @@ class BasePlugin:
                 Domoticz.Debug("AC fan widget Level = {}".format(self.WACfanspeedvalue))
 
         # check setpoint
-        APIjson = DomoticzAPI("type=devices&rid={}".format(self.WACsetpoint))
-        if APIjson:
-           for device in APIjson["result"]:  # check if idx is ok
-               self.WACsetpointvalue = int(device["SetPoint"])
-               Domoticz.Debug("AC setpoint = {}".format(self.WACsetpointvalue))
+        ##APIjson = DomoticzAPI("type=devices&rid={}".format(self.WACsetpoint))
+        #if APIjson:
+           #for device in APIjson["result"]:  # check if idx is ok
+               #self.WACsetpointvalue = int(device["SetPoint"])
+               #Domoticz.Debug("AC setpoint = {}".format(self.WACsetpointvalue))
 
 
     def readTemps(self):
