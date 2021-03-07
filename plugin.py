@@ -177,9 +177,9 @@ class BasePlugin:
 
         # build lists of idx widget of CAC221
         self.WACmode = parseCSV(Parameters["Username"])
-        Domoticz.Debug("AC mode widget idx = {}".format(self.self.WACmode))
+        Domoticz.Debug("AC mode widget idx = {}".format(self.WACmode))
         self.WACfanspeed = parseCSV(Parameters["Password"])
-        Domoticz.Debug("AC fan speed widget idx = {}".format(self.self.WACfanspeed))
+        Domoticz.Debug("AC fan speed widget idx = {}".format(self.WACfanspeed))
         self.WACsetpoint = parseCSV(Parameters["Mode1"])
         Domoticz.Debug("AC setpoint widget idx = {}".format(self.WACsetpoint))
 
