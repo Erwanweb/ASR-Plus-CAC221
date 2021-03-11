@@ -251,7 +251,7 @@ class BasePlugin:
                 self.ModeAuto = True
                 self.powerOn = 1
                 Devices[2].Update(nValue = self.powerOn,sValue = "30")  # AC mode Heat
-                Devices[5].Update(nValue = self.powerOn,sValue = "10")  # AC Fan Speed Auto
+                Devices[3].Update(nValue = self.powerOn,sValue = "10")  # AC Fan Speed Auto
 
             elif (Devices[1].sValue == "30"): # Mode manuel
                 self.ModeAuto = False
