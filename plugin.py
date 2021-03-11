@@ -303,7 +303,7 @@ class BasePlugin:
                 if self.PresenceTH :
                     if self.intemp < (float(Devices[5].sValue) - ((self.deltamax / 10) + (self.deltamax / 20))):
                         self.setpoint = 30.0
-                        Domoticz.Log("AUTOMode - used setpoint is Max 30 and fan speed Max because room temp is lower more than delta min from setpoint")
+                        Domoticz.Debug("AUTOMode - used setpoint is Max 30 and fan speed Max because room temp is lower more than delta min from setpoint")
                         # AC setpoint = max setpoint
                         if not self.WACsetpointvalue == self.setpoint:
                             for idx in self.WACsetpoint:
@@ -318,7 +318,7 @@ class BasePlugin:
                                 self.WACfanspeedvalue = 40
                     else :
                         self.setpoint = float(Devices[5].sValue)
-                        Domoticz.Log("AUTOMode - used setpoint is normal : " + str(self.setpoint))
+                        Domoticz.Debug("AUTOMode - used setpoint is normal : " + str(self.setpoint))
                         # AC setpoint = thermostat setpoint
                         if not self.WACsetpointvalue == self.setpoint:
                             for idx in self.WACsetpoint:
@@ -328,7 +328,7 @@ class BasePlugin:
                             # AC Fan Speed High
                             if not Devices[3].sValue == "40":
                                 Devices[3].Update(nValue=self.powerOn, sValue="40")
-                                Domoticz.Log("Fan speed high because room temp is lower more than delta min from setpoint")
+                                Domoticz.Debug("Fan speed high because room temp is lower more than delta min from setpoint")
                             if not self.WACfanspeedvalue == 40:
                                 for idx in self.WACfanspeed:
                                     DomoticzAPI("ype=command&param=switchlight&idx={}&switchcmd=Set Level&level=40".format(idx))
@@ -337,7 +337,7 @@ class BasePlugin:
                             # AC Fan Speed Auto
                             if not Devices[3].sValue == "10":
                                 Devices[3].Update(nValue=self.powerOn, sValue="10")
-                                Domoticz.Log("Fan speed auto because room temp is near from setpoint")
+                                Domoticz.Debug("Fan speed auto because room temp is near from setpoint")
                             if not self.WACfanspeedvalue == 10:
                                 for idx in self.WACfanspeed:
                                     DomoticzAPI("ype=command&param=switchlight&idx={}&switchcmd=Set Level&level=10".format(idx))
@@ -347,7 +347,7 @@ class BasePlugin:
                     self.setpoint = (float(Devices[5].sValue) - self.reductedsp)
                     if self.setpoint < 17:  # Setpoint Lower than range 17 to 30
                         self.setpoint = 17.0
-                    Domoticz.Log("AUTOMode - used setpoint is reducted one : " + str(self.setpoint))
+                    Domoticz.Debug("AUTOMode - used setpoint is reducted one : " + str(self.setpoint))
                     if not self.WACsetpointvalue == self.setpoint:
                         # AC setpoint = Thermostat setpoint reducted in limit of range
                         for idx in self.WACsetpoint:
@@ -355,7 +355,7 @@ class BasePlugin:
                             self.WACsetpointvalue = self.setpoint
                     if not Devices[3].sValue == "10":
                         Devices[3].Update(nValue=self.powerOn, sValue="10")
-                        Domoticz.Log("Fan speed auto because room temp is near from setpoint")
+                        Domoticz.Debug("Fan speed auto because room temp is near from setpoint")
                     if not self.WACfanspeedvalue == 10:
                         for idx in self.WACfanspeed:
                             DomoticzAPI("type=command&param=switchlight&idx={}&switchcmd=Set Level&level=10".format(idx))
@@ -363,21 +363,22 @@ class BasePlugin:
 
             else:
                 Domoticz.Log("MANUAL mode")
-                self.setpoint = float(Devices[3].sValue)
+                self.setpoint = float(Devices[5].sValue)
                 if not self.WACmodevalue == Devices[2].sValue:
                     for idx in self.WACmode:
                             DomoticzAPI("type=command&param=switchlight&idx={}&switchcmd=Set Level&level={}".format(idx, Devices[2].sValue))
+                            Domoticz.Debug("Manual mode - MODE = {}".format(self.WACmode))
                 if not self.WACfanspeedvalue == Devices[3].sValue:
                     for idx in self.WACfanspeed:
                             DomoticzAPI("type=command&param=switchlight&idx={}&switchcmd=Set Level&level={}".format(idx, Devices[3].sValue))
+                            Domoticz.Debug("Manual mode - FANSPEED = {}".format(self.WACfanspeed))
                 if not self.WACsetpointvalue == self.setpoint:
                     for idx in self.WACsetpoint:
                         DomoticzAPI("type=command&param=setsetpoint&idx={}&setpoint={}".format(idx, self.setpoint))
                         self.WACsetpointvalue = self.setpoint
+                        Domoticz.Debug("Manual mode - SETPOINT = {}".format(self.self.self.WACsetpointvalue))
 
-        if self.nexttemps <= now:
-            # call the Domoticz json API for a temperature devices update, to get the lastest temps (and avoid the
-            # connection time out time after 10mins that floods domoticz logs in versions of domoticz since spring 2018)
+        if self.nexttemps + timedelta(minutes=2) <= now:
             self.readTemps()
 
     def readTemps(self):
