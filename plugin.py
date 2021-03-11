@@ -375,9 +375,7 @@ class BasePlugin:
                         DomoticzAPI("type=command&param=setsetpoint&idx={}&setpoint={}".format(idx, self.setpoint))
                         self.WACsetpointvalue = self.setpoint
 
-        if self.nexttemps <= now:
-            # call the Domoticz json API for a temperature devices update, to get the lastest temps (and avoid the
-            # connection time out time after 10mins that floods domoticz logs in versions of domoticz since spring 2018)
+        if self.nexttemps + timedelta(minutes=2) <= now:
             self.readTemps()
 
     def readTemps(self):
