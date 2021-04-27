@@ -278,10 +278,11 @@ class BasePlugin:
 
         if (Unit == 3): # AC Manual Fan speed
             Devices[3].Update(nValue=self.powerOn, sValue=str(Level))
-
-        if Unit in (5, 7):  # tout le reste
+            
+        if (Unit == 5): # AC Manual Fan speed
+            Devices[5].Update(nValue=self.powerOn, sValue=str(Level))
+            self.setpoint = float(Devices[5].sValue)
             self.onHeartbeat()
-
 
     def onHeartbeat(self):
         Domoticz.Debug("onHeartbeat called")
@@ -389,7 +390,7 @@ class BasePlugin:
                 #if not self.WACmodevalue == str(Devices[2].sValue):
                     for idx in self.WACmode:
                         DomoticzAPI("type=command&param=switchlight&idx={}&switchcmd=Set Level&level={}".format(idx,self.WACmodevalue))
-                    self.WACsetpointvalue = str(Devices[2].sValue)
+                    self.WACmodevalue = str(Devices[2].sValue)
                     Domoticz.Debug("Manual mode - MODE = {}".format(self.WACmodevalue))
                 if not Devices[3].sValue == str(self.WACfanspeed):
                 #if not self.WACfanspeedvalue == str(Devices[3].sValue):
