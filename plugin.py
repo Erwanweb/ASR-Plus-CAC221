@@ -311,7 +311,7 @@ class BasePlugin:
                         self.setpoint = 30.0
                         Domoticz.Debug(
                             "AUTOMode - used setpoint is Max 30 and fan speed Max because room temp is lower more than delta min from setpoint")
-                        AC setpoint = max setpoint
+                        #AC setpoint = max setpoint
                         if not self.WACsetpointvalue == self.setpoint:
                             for idx in self.WACsetpoint:
                                 DomoticzAPI(
