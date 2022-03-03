@@ -545,7 +545,7 @@ class BasePlugin:
                 if idx in self.WACfanspeed:
                     Domoticz.Debug("WACfanspeed with idx '{}' Named '{}' have a Leval at '{}' ".format(idx, device["Name"], device["Level"]))
                 if idx in self.WACsetpoint:
-                    Domoticz.Debug("WACsetpoint with idx '{}' Named '{}' have a Leval at '{}' ".format(idx, device["Name"], device["Setpoint"]))
+                    Domoticz.Debug("WACsetpoint with idx '{}' Named '{}' have a Leval at '{}' ".format(idx, device["Name"], device["SetPoint"]))
 
         # Check mode of CAC221s
         # url = "http://127.0.0.1:8080/json.htm?type=devices&rid=".format(self.WACmode)
