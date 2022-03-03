@@ -372,7 +372,7 @@ class BasePlugin:
                         Domoticz.Debug("Fan speed auto because reducdted setpoint")
                     if not self.WACfanspeedvalue == 10:
                         for idx in self.WACfanspeed:
-                            DomoticzAPI(type=command&param=switchlight&idx={}&switchcmd=Set Level&level=10".format(idx))
+                            DomoticzAPI("type=command&param=switchlight&idx={}&switchcmd=Set Level&level=10".format(idx))
                             Domoticz.Debug("WACfanspeed isn't at good Level at '{}'- Updating AC fanspeed widget Level at '10'".format(self.WACfanspeedvalue))
 
             else: # Manual Mode
