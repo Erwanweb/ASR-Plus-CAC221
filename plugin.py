@@ -316,7 +316,7 @@ class BasePlugin:
                         if not self.WACsetpointvalue == self.setpoint:
                             for idx in self.WACsetpoint:
                                 DomoticzAPI("type=command&param=setsetpoint&idx={}&setpoint={}".format(idx, self.setpoint))
-                            #self.WACsetpointvalue = self.setpoint
+                            self.WACsetpointvalue = self.setpoint
                         # AC Fan Speed High
                         if not Devices[3].sValue == "40":
                             Devices[3].Update(nValue=self.powerOn, sValue="40")
