@@ -536,7 +536,7 @@ class BasePlugin:
 
         Domoticz.Debug("CAC221widgetcontrol called")
 
-        devicesAPI = DomoticzAPI("type=devices&filter=light&used=true&order=Name")
+        devicesAPI = DomoticzAPI("type=devices&filter=all&used=true&order=Name")
         if devicesAPI:
             for device in devicesAPI["result"]:  # parse the presence/motion sensors (DT) device
                 idx = int(device["idx"])
