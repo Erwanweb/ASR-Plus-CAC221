@@ -351,7 +351,7 @@ class BasePlugin:
                             self.WACsetpointvalue = self.setpoint
                         # check if turbopower still needed or not
                         if self.intemp > (float(Devices[5].sValue) - (self.deltamax / 20)):
-                            self.Turbopower = False
+                            self.Turbofan = False
                     else : # Turbopower is off
                         Domoticz.Debug("AUTOMode - Turbopower OFF - Used setpoint is normal : " + str(self.setpoint))
                         self.setpoint = float(Devices[5].sValue)
