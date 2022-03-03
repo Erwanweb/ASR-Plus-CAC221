@@ -540,7 +540,7 @@ class BasePlugin:
         if devicesAPI:
             for device in devicesAPI["result"]:  # parse the presence/motion sensors (DT) device
                 idx = int(device["idx"])
-                if idx in WACfanspeed:
+                if idx in self.WACfanspeed:
                     Domoticz.Debug("WACfanspeed {} Named '{}' have a Leval at : ".format(idx, device["Name"]))
 
         # Check mode of CAC221
