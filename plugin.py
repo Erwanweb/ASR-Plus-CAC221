@@ -553,7 +553,7 @@ class BasePlugin:
         APIWACfanspeed = DomoticzAPI("type=devices&rid=".format(self.WACfanspeed))
         if APIWACfanspeed:
             for device in APIWACfanspeed["result"]:  # check the level
-                self.WACfanspeedvalue = device["Level"]
+                #self.WACfanspeedvalue = device["Level"]
                 Domoticz.Debug("AC fan widget Level = ".format(self.WACfanspeedvalue))
 
                 #if device["Level"] == 10 :
