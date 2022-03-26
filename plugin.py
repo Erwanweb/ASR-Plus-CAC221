@@ -318,6 +318,9 @@ class BasePlugin:
                 Domoticz.Debug("Forced ECO not Request anymore")
                 if Devices[4].nValue == 1:
                     Devices[4].Update(nValue=0, sValue=Devices[4].sValue)
+        else:
+            if Devices[4].nValue == 1:
+                Devices[4].Update(nValue=0, sValue=Devices[4].sValue)
 
 
         # Check the mode, used setpoint and fan speed is ok
