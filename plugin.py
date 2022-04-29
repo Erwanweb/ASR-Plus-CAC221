@@ -333,10 +333,10 @@ class BasePlugin:
         else:
             if self.ModeAuto: # Auto Mode
                 # force heating mode
-                if not self.WACmodevalue == 20:
+                if not self.WACmodevalue == 30:
                     for idx in self.WACmode:
-                        DomoticzAPI("type=command&param=switchlight&idx={}&switchcmd=Set Level&level=20".format(idx))
-                        Domoticz.Debug("WACmode isn't at good Level at '{}'- Updating AC mode widget Level at '20'".format(self.WACmodevalue))
+                        DomoticzAPI("type=command&param=switchlight&idx={}&switchcmd=Set Level&level=30".format(idx))
+                        Domoticz.Debug("WACmode isn't at good Level at '{}'- Updating AC mode widget Level at '30' for heating".format(self.WACmodevalue))
 
                 if self.PresenceTH: # We use normal setpoint for confort
 
@@ -419,16 +419,16 @@ class BasePlugin:
                 if Devices[2].sValue == "10":
                     self.WACmodevaluenew = 10
                 elif Devices[2].sValue == "20":
-                    self.WACmodevaluenew = 10
-                elif Devices[2].sValue == "30":
                     self.WACmodevaluenew = 20
-                elif Devices[2].sValue == "40":
+                elif Devices[2].sValue == "30":
                     self.WACmodevaluenew = 30
+                elif Devices[2].sValue == "40":
+                    self.WACmodevaluenew = 40
                 # check if wac is ok
                 if not self.WACmodevaluenew == self.WACmodevalue:
                     for idx in self.WACmode:
-                        DomoticzAPI("type=command&param=switchlight&idx={}&switchcmd=Set Level&level={}".format(idx,self.WACmodevalue))
-                    Domoticz.Debug("Manual mode - MODE = {}".format(self.WACmodevalue))
+                        DomoticzAPI("type=command&param=switchlight&idx={}&switchcmd=Set Level&level={}".format(idx,self.WACmodevaluenew))
+                    Domoticz.Debug("Manual mode - MODE = {}".format(self.WACmodevaluenew))
                 if not Devices[3].sValue == str(self.WACfanspeedvalue):
                     for idx in self.WACfanspeed:
                         DomoticzAPI("type=command&param=switchlight&idx={}&switchcmd=Set Level&level={}".format(idx,str(Devices[3].sValue)))
