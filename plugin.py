@@ -433,10 +433,10 @@ class BasePlugin:
                     for idx in self.WACfanspeed:
                         DomoticzAPI("type=command&param=switchlight&idx={}&switchcmd=Set Level&level={}".format(idx,str(Devices[3].sValue)))
                     Domoticz.Debug("Manual mode - FANSPEED = {}".format(self.WACfanspeedvalue))
-                if not self.WACsetpointvalue == self.setpoint:
-                    for idx in self.WACsetpoint:
-                        DomoticzAPI("type=command&param=setsetpoint&idx={}&setpoint={}".format(idx, self.setpoint))
-                    Domoticz.Debug("Manual mode - SETPOINT = {}".format(self.WACsetpointvalue))
+                #if not self.WACsetpointvalue == self.setpoint:
+                    #for idx in self.WACsetpoint:
+                        #DomoticzAPI("type=command&param=setsetpoint&idx={}&setpoint={}".format(idx, self.setpoint))
+                    #Domoticz.Debug("Manual mode - SETPOINT = {}".format(self.WACsetpointvalue))
 
         if self.nexttemps + timedelta(minutes=2) <= now:
             self.readTemps()
