@@ -251,6 +251,9 @@ class BasePlugin:
         # update widget values
         # self.CAC221widgetcontrol()
 
+        # Switch Domotciz heartbeat to 30seconds
+        Domoticz.Heartbeat(30)
+
     def onStop(self):
         Domoticz.Log("onStop called")
         Domoticz.Debugging(0)
