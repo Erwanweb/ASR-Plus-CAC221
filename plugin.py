@@ -40,6 +40,7 @@
 
 import json
 import math
+import urllib
 import urllib.parse as parse
 import urllib.request as request
 from datetime import datetime, timedelta
@@ -746,27 +747,35 @@ def parseCSV(strCSV):
 
 def DomoticzAPI(APICall):
     resultJson = None
-    url = "http://127.0.0.1:8080/json.htm"
-    params = {'param': APICall}
-    headers = {'Content-Type': 'application/json'}
+    url = f"http://127.0.0.1:8080/json.htm?{parse.quote(APICall, safe='&=')}"
 
     try:
-        Domoticz.Log( f"Domoticz API requests  {url} {params} {headers}")
-        response = requests.get(url, params=params, headers=headers)
-        response.raise_for_status()  # Raise an exception for 4xx or 5xx status codes
+        Domoticz.Log(f"Domoticz API request: {url}")
+        req = request.Request(url)
+        response = request.urlopen(req)
 
-        resultJson = response.json()
-        Domoticz.Log( f"Domoticz API result  {resultJson}")
+        if response.status == 200:
+            resultJson = json.loads(response.read().decode('utf-8'))
+            if resultJson.get("status") != "OK":
+                Domoticz.Error(f"Domoticz API returned an error: status = {resultJson.get('status')}")
+                resultJson = None
+        else:
+            Domoticz.Error(f"Domoticz API: HTTP error = {response.status}")
 
-        if resultJson.get("status") != "OK":
-            Domoticz.Error("Domoticz API returned an error: status = %s" %resultJson.get("status"))
-            resultJson = None
+    except urllib.error.HTTPError as e:
+        Domoticz.Error(f"HTTP error calling '{url}': {e}")
 
-    except requests.exceptions.RequestException as e:
-        Domoticz.Error( f"Error calling '{url}': {e}")
+    except urllib.error.URLError as e:
+        Domoticz.Error(f"URL error calling '{url}': {e}")
+
     except json.JSONDecodeError as e:
-        Domoticz.Error("Error decoding JSON response: %s" % e)
+        Domoticz.Error(f"JSON decoding error: {e}")
+
+    except Exception as e:
+        Domoticz.Error(f"Error calling '{url}': {e}")
+
     return resultJson
+
 
 
 def CheckParam(name, value, default):
