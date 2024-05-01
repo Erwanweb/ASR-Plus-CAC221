@@ -87,21 +87,16 @@ class BasePlugin:
         self.DTpresence = []
         self.Presencemode = False
         self.ForcedEco = False
-        self.ForcedEcoTime = datetime.now()
         self.PresenceDetected = False
         self.Presence = False
         self.PresenceTH = False
-        self.PresenceTHdelay = datetime.now()
-        self.presencechangedtime = datetime.now()
         self.PresenceSensor = False
-        self.DTtempo = datetime.now()
         self.presenceondelay = 2  # time between first detection and last detection before turning presence ON
         self.presenceoffdelay = 45  # time between last detection before turning presence OFF
         self.pauseondelay = 1
         self.ForcedECOoffdelay = 30
         self.pause = False
         self.pauserequested = False
-        self.pauserequestchangedtime = datetime.now()
         self.reductedsp = 3
         self.InTempSensors = []
         self.intemp = 25.0
@@ -109,14 +104,20 @@ class BasePlugin:
         self.overheatvalue = 1
         self.setpointnew = 21
         self.setpointadjusted = 21
-        self.nexttemps = datetime.now()
-        self.controlinfotime = datetime.now()
-        self.controlsettime = datetime.now()
-        self.controloverheatvalue = datetime.now()
         self.repeatorder = 0
-        self.repeatordertime = datetime.now()
-        self.PLUGINstarteddtime = datetime.now()
-        return
+
+        now = datetime.now()
+        self.ForcedEcoTime = now
+        self.PresenceTHdelay = now
+        self.presencechangedtime = now
+        self.DTtempo = now
+        self.pauserequestchangedtime = now
+        self.nexttemps = now
+        self.controlinfotime = now
+        self.controlsettime = now
+        self.controloverheatvalue = now
+        self.repeatordertime = now
+        self.PLUGINstarteddtime = now
 
     def onStart(self):
         Domoticz.Log("onStart called")
@@ -250,9 +251,9 @@ class BasePlugin:
         self.controlinfotime = datetime.now()
         self.PLUGINstarteddtime = datetime.now()
 
-        # Set domoticz heartbeat to 30 s (onheattbeat() will be called every 30s )
+        # Set domoticz heartbeat to 20 s (onheattbeat() will be called every 20 )
+        Domoticz.Heartbeat(20)
 
-        Domoticz.Heartbeat(30)
         # update temp
         self.readTemps()
 
