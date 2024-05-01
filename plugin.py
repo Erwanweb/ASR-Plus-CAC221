@@ -751,7 +751,7 @@ def DomoticzAPI(APICall):
     url = f"http://127.0.0.1:8080/json.htm?{parse.quote(APICall, safe='&=')}"
 
     try:
-        Domoticz.Log(f"Domoticz API request: {url}")
+        Domoticz.Debug(f"Domoticz API request: {url}")
         req = request.Request(url)
         response = request.urlopen(req)
 
