@@ -751,13 +751,17 @@ def DomoticzAPI(APICall):
     headers = {'Content-Type': 'application/json'}
 
     try:
+        Domoticz.Log( f"Domoticz API requests  {url} {params} {headers}")
         response = requests.get(url, params=params, headers=headers)
         response.raise_for_status()  # Raise an exception for 4xx or 5xx status codes
 
         resultJson = response.json()
+        Domoticz.Log( f"Domoticz API result  {resultJson}")
+
         if resultJson.get("status") != "OK":
             Domoticz.Error("Domoticz API returned an error: status = %s" %resultJson.get("status"))
             resultJson = None
+
     except requests.exceptions.RequestException as e:
         Domoticz.Error( f"Error calling '{url}': {e}")
     except json.JSONDecodeError as e:
