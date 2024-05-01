@@ -1,10 +1,12 @@
-"""
-AC Aircon Smart Remote plugin using CASA.IA CAC 221 for Domoticz
-Author: MrErwan,
-Version:    0.0.1: alpha...
-Version:    2.1.1: overheat control
-Version:    2.1.2: IR order repeat
-"""
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+# AC Aircon Smart Remote plugin using CASA.IA CAC 221 for Domoticz
+# Author: MrErwan,
+# Version:    0.0.1: alpha...
+# Version:    2.1.1: overheat control
+# Version:    2.1.2: IR order repeat
+
 """
 <plugin key="AC-ASR-CAC221" name="AC Aircon Smart Remote PLUS for CAC221" author="MrErwan" version="2.1.2" externallink="https://github.com/Erwanweb/ASR-Plus-CAC221.git">
     <description>
@@ -35,19 +37,22 @@ Version:    2.1.2: IR order repeat
     </params>
 </plugin>
 """
-import Domoticz
-# uniquement pour les besoins de cette appli
-import getopt, sys
-# pour lire le json
+
 import json
+import math
 import urllib
 import urllib.parse as parse
 import urllib.request as request
 from datetime import datetime, timedelta
-import time
-import math
-import base64
-import itertools
+
+import Domoticz
+import requests
+
+try:
+    from Domoticz import Devices, Images, Parameters, Settings
+except ImportError:
+    pass
+
 
 
 class deviceparam:
@@ -82,21 +87,16 @@ class BasePlugin:
         self.DTpresence = []
         self.Presencemode = False
         self.ForcedEco = False
-        self.ForcedEcoTime = datetime.now()
         self.PresenceDetected = False
         self.Presence = False
         self.PresenceTH = False
-        self.PresenceTHdelay = datetime.now()
-        self.presencechangedtime = datetime.now()
         self.PresenceSensor = False
-        self.DTtempo = datetime.now()
         self.presenceondelay = 2  # time between first detection and last detection before turning presence ON
         self.presenceoffdelay = 45  # time between last detection before turning presence OFF
         self.pauseondelay = 1
         self.ForcedECOoffdelay = 30
         self.pause = False
         self.pauserequested = False
-        self.pauserequestchangedtime = datetime.now()
         self.reductedsp = 3
         self.InTempSensors = []
         self.intemp = 25.0
@@ -104,14 +104,20 @@ class BasePlugin:
         self.overheatvalue = 1
         self.setpointnew = 21
         self.setpointadjusted = 21
-        self.nexttemps = datetime.now()
-        self.controlinfotime = datetime.now()
-        self.controlsettime = datetime.now()
-        self.controloverheatvalue = datetime.now()
         self.repeatorder = 0
-        self.repeatordertime = datetime.now()
-        self.PLUGINstarteddtime = datetime.now()
-        return
+
+        now = datetime.now()
+        self.ForcedEcoTime = now
+        self.PresenceTHdelay = now
+        self.presencechangedtime = now
+        self.DTtempo = now
+        self.pauserequestchangedtime = now
+        self.nexttemps = now
+        self.controlinfotime = now
+        self.controlsettime = now
+        self.controloverheatvalue = now
+        self.repeatordertime = now
+        self.PLUGINstarteddtime = now
 
     def onStart(self):
         Domoticz.Log("onStart called")
@@ -245,6 +251,9 @@ class BasePlugin:
         self.controlinfotime = datetime.now()
         self.PLUGINstarteddtime = datetime.now()
 
+        # Set domoticz heartbeat to 20 s (onheattbeat() will be called every 20 )
+        Domoticz.Heartbeat(20)
+
         # update temp
         self.readTemps()
 
@@ -326,7 +335,7 @@ class BasePlugin:
         # check presence detection
         self.PresenceDetection()
 
-# REPEAT IR ORDER -----------------------------------------------------------------------------------------------------
+        # REPEAT IR ORDER -----------------------------------------------------------------------------------------------------
         if self.powerOn:
             if self.ModeAuto:
                 if self.repeatorder > 0:  # We repeat IR order to be sure AC received and take the good one
@@ -339,7 +348,7 @@ class BasePlugin:
                 else:
                     Domoticz.Debug("NO Repeating IR Order - Function is desactivate ")
 
-# CHECK FORCED ECO PERIOD ----------------------------------------------------------------------------------------------
+        # CHECK FORCED ECO PERIOD ----------------------------------------------------------------------------------------------
         if self.ForcedEco:
             #if self.ForcedECOoffdelay != 0
             if self.ForcedEcoTime + timedelta(minutes=self.ForcedECOoffdelay) <= now:
@@ -351,7 +360,7 @@ class BasePlugin:
             if Devices[4].nValue == 1:
                 Devices[4].Update(nValue=0, sValue=Devices[4].sValue)
 
-# MODE CHECK  ----------------------------------------------------------------------------------------------------------
+        # MODE CHECK  ----------------------------------------------------------------------------------------------------------
         # Check the mode, used setpoint and fan speed is ok
         if not self.powerOn:
             if not self.WACmodevalue == 0:
@@ -361,11 +370,11 @@ class BasePlugin:
                     self.repeatordertime = datetime.now()
                 #self.WACmodevalue = 0
         else:
-            if self.ModeAuto: # Auto Mode
+            if self.ModeAuto:  # Auto Mode
 
-# CHOOSING AC SETPOINT IN AUTO MODE ------------------------------------------------------------------------------------
+                # CHOOSING AC SETPOINT IN AUTO MODE ------------------------------------------------------------------------------------
                 # Choose AC setpoint if presence or not and check if AC setpoint is over and need adjustment
-                if self.PresenceTH: # We use normal thermostat setpoint for confort
+                if self.PresenceTH:  # We use normal thermostat setpoint for confort
                     self.setpoint = round(float(Devices[5].sValue))
                 else:  # No presence detected so we use reducted thermosat setpoint
                     self.setpoint = round(float(Devices[5].sValue) - self.reductedsp)
@@ -395,14 +404,14 @@ class BasePlugin:
                             self.setpoint = 17
                         Domoticz.Debug("NO Overheat - AC Setpoint is '{}'".format(self.setpoint))
 
-                else : # No presence detected so we use reducted thermosat setpoint
+                else :  # No presence detected so we use reducted thermosat setpoint
                     if self.intemp < ((float(Devices[5].sValue) - 0.2) - self.reductedsp):
                         self.overheat = False
                         if self.setpoint < 17:
                             self.setpoint = 17
                         Domoticz.Debug("NO Overheat - No Presence - AC Reducted Setpoint is '{}'".format(self.setpoint))
 
-# OVERHEAT ----------------------------------------------------------------------------------------------------------
+                # OVERHEAT ----------------------------------------------------------------------------------------------------------
                 # check if overheat
                 if self.setpoint < 17:
                     if not self.overheat:
@@ -426,7 +435,7 @@ class BasePlugin:
                             DomoticzAPI("type=command&param=switchlight&idx={}&switchcmd=Set Level&level=20".format(idx))
                         Domoticz.Debug("WACfanspeed isn't at good Level at '{}'- Updating AC fanspeed widget Level at '20'".format(self.WACfanspeedvalue))
                         self.repeatordertime = datetime.now()
-                else : # no overheating, so heating Mode and auto control
+                else :  # no overheating, so heating Mode and auto control
                     Domoticz.Debug("AC no present overheat - Setpoint is '{}' for Room Temp '{}'".format(self.setpoint, self.intemp))
                     if not self.WACmodevalue == 30:
                         for idx in self.WACmode:
@@ -434,12 +443,12 @@ class BasePlugin:
                         Domoticz.Debug("WACmode isn't at good Level at '{}'- Updating AC mode widget Level at '30' for heating".format(self.WACmodevalue))
                         self.repeatordertime = datetime.now()
 
-# NORMAL AUTO MODE -----------------------------------------------------------------------------------------------------
+                    # NORMAL AUTO MODE -----------------------------------------------------------------------------------------------------
                     if not self.PresenceTH:
                         self.Turbofan = False
                         self.Turbopower = False
                     else :
-                    # check if turbo needed
+                        # check if turbo needed
                         if self.intemp < (float(Devices[5].sValue) - (self.deltamax / 10)):
                             self.Turbofan = True
                         if self.intemp < (float(Devices[5].sValue) - ((self.deltamax / 10) + (self.deltamax / 20))):
@@ -477,7 +486,7 @@ class BasePlugin:
                                 DomoticzAPI("type=command&param=setsetpoint&idx={}&setpoint={}".format(idx, self.setpoint))
                             Domoticz.Debug("AC Setpoint is not ok - Updating AC setpoint to : " + str(self.setpoint))
                             self.repeatordertime = datetime.now()
-                                # self.WACsetpointvalue = self.setpoint
+                            # self.WACsetpointvalue = self.setpoint
                         # check if turbopower still needed or not
                         if self.intemp > (float(Devices[5].sValue) - (self.deltamax / 10)):
                             self.Turbopower = False
@@ -490,8 +499,8 @@ class BasePlugin:
                             Domoticz.Debug("AC Setpoint is not ok - Updating AC setpoint to : " + str(self.setpoint))
                             self.repeatordertime = datetime.now()
 
-# MANUAL MODE ----------------------------------------------------------------------------------------------------------
-            else: # Manual Mode
+            # MANUAL MODE ----------------------------------------------------------------------------------------------------------
+            else:  # Manual Mode
                 self.setpoint = round(float(Devices[5].sValue))
                 # check manual asked mode
                 if Devices[2].sValue == "10":
@@ -521,11 +530,11 @@ class BasePlugin:
                     self.repeatordertime = datetime.now()
                     Domoticz.Debug("AC Setpoint is not ok - Updating AC setpoint to : " + str(self.setpoint))
 
-# READING ROOM TEMP ----------------------------------------------------------------------------------------------------
+        # READING ROOM TEMP ----------------------------------------------------------------------------------------------------
         if self.nexttemps + timedelta(seconds=30) <= now:
             self.readTemps()
 
-# NORMAL LOG -----------------------------------------------------------------------------------------------------------
+        # NORMAL LOG -----------------------------------------------------------------------------------------------------------
         if self.powerOn:
             if self.ModeAuto:
                 Domoticz.Log("System ON - AUTO - Room Temp : {}ºC - System Setpoint : '{}' - Aircon Setpoint : '{}' ".format(self.intemp, self.pluginsetpoint, self.setpoint))
@@ -534,7 +543,7 @@ class BasePlugin:
         else:
             Domoticz.Log("System OFF")
 
-# OTHER DEF -----------------------------------------------------------------------------------------------------------
+    # OTHER DEF -----------------------------------------------------------------------------------------------------------
     def readTemps(self):
         Domoticz.Debug("readTemps called")
         self.nexttemps = datetime.now()
@@ -727,36 +736,47 @@ def parseCSV(strCSV):
     for value in strCSV.split(","):
         try:
             val = int(value)
-        except:
-            pass
-        else:
             listvals.append(val)
+        except ValueError:
+            try:
+                val = float(value)
+                listvals.append(val)
+            except ValueError:
+                Domoticz.Error(f"Skipping non-numeric value: {value}")
     return listvals
 
 
 def DomoticzAPI(APICall):
     resultJson = None
-    url = "http://127.0.0.1:8080/json.htm?{}".format(parse.quote(APICall, safe="&="))
-    Domoticz.Debug("Calling domoticz API: {}".format(url))
-    try:
-        req = request.Request(url)
-        # if Parameters["Username"] != "":
-        #     Domoticz.Debug("Add authentification for user {}".format(Parameters["Username"]))
-        #     credentials = ('%s:%s' % (Parameters["Username"], Parameters["Password"]))
-        #     encoded_credentials = base64.b64encode(credentials.encode('ascii'))
-        #     req.add_header('Authorization', 'Basic %s' % encoded_credentials.decode("ascii"))
+    url = f"http://127.0.0.1:8080/json.htm?{parse.quote(APICall, safe='&=')}"
 
+    try:
+        Domoticz.Debug(f"Domoticz API request: {url}")
+        req = request.Request(url)
         response = request.urlopen(req)
+
         if response.status == 200:
             resultJson = json.loads(response.read().decode('utf-8'))
-            if resultJson["status"] != "OK":
-                Domoticz.Error("Domoticz API returned an error: status = {}".format(resultJson["status"]))
+            if resultJson.get("status") != "OK":
+                Domoticz.Error(f"Domoticz API returned an error: status = {resultJson.get('status')}")
                 resultJson = None
         else:
-            Domoticz.Error("Domoticz API: http error = {}".format(response.status))
-    except:
-        Domoticz.Error("Error calling '{}'".format(url))
+            Domoticz.Error(f"Domoticz API: HTTP error = {response.status}")
+
+    except urllib.error.HTTPError as e:
+        Domoticz.Error(f"HTTP error calling '{url}': {e}")
+
+    except urllib.error.URLError as e:
+        Domoticz.Error(f"URL error calling '{url}': {e}")
+
+    except json.JSONDecodeError as e:
+        Domoticz.Error(f"JSON decoding error: {e}")
+
+    except Exception as e:
+        Domoticz.Error(f"Error calling '{url}': {e}")
+
     return resultJson
+
 
 
 def CheckParam(name, value, default):
@@ -764,9 +784,7 @@ def CheckParam(name, value, default):
         param = int(value)
     except ValueError:
         param = default
-        Domoticz.Error(
-            "Parameter '{}' has an invalid value of '{}' ! defaut of '{}' is instead used.".format(name, value,
-                                                                                                   default))
+        Domoticz.Error( f"Parameter '{name}' has an invalid value of '{value}' ! defaut of '{param}' is instead used.")
     return param
 
 
