@@ -756,12 +756,12 @@ def DomoticzAPI(APICall):
 
         resultJson = response.json()
         if resultJson.get("status") != "OK":
-            Domoticz.Error("Domoticz API returned an error: status =", resultJson.get("status"))
+            Domoticz.Error("Domoticz API returned an error: status = %s" %resultJson.get("status"))
             resultJson = None
     except requests.exceptions.RequestException as e:
-        Domoticz.Error("Error calling '{}': {}".format(url, e))
+        Domoticz.Error( f"Error calling '{url}': {e}")
     except json.JSONDecodeError as e:
-        Domoticz.Error("Error decoding JSON response:", e)
+        Domoticz.Error("Error decoding JSON response: %s" % e)
     return resultJson
 
 
@@ -770,9 +770,7 @@ def CheckParam(name, value, default):
         param = int(value)
     except ValueError:
         param = default
-        Domoticz.Error(
-            "Parameter '{}' has an invalid value of '{}' ! defaut of '{}' is instead used.".format(name, value,
-                                                                                                   default))
+        Domoticz.Error( f"Parameter '{name}' has an invalid value of '{value}' ! defaut of '{param}' is instead used.")
     return param
 
 
