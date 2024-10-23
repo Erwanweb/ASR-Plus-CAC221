@@ -143,7 +143,7 @@ class BasePlugin:
                        "LevelNames": "Disconnected|Off|Auto|Manual",
                        "LevelOffHidden": "true",
                        "SelectorStyle": "0"}
-            Domoticz.Device(Name="AC Control", Unit=1, TypeName="Selector Switch", Switchtype=18, Image=9,
+            Domoticz.Device(Name="Control", Unit=1, TypeName="Selector Switch", Switchtype=18, Image=9,
                             Options=Options, Used=1).Create()
             devicecreated.append(deviceparam(1, 0, "10"))  # default is Off
         if 2 not in Devices:
