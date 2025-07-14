@@ -22,10 +22,4 @@ Upgrade :
 
 cd ~/domoticz/plugins/ASR-Plus-CAC221
 
-git reset --hard
-
-git pull --force
-
-sudo chmod +x plugin.py
-
-sudo /etc/init.d/domoticz.sh restart
+git reset --hard && git pull --force
